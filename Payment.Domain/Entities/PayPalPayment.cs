@@ -1,4 +1,5 @@
 using System;
+using Payment.Domain.ValueObjects;
 
 namespace Payment.Domain.Entities
 {
@@ -10,10 +11,10 @@ namespace Payment.Domain.Entities
             DateTime expireDate, 
             decimal total, 
             decimal totalPaid, 
-            string address, 
-            string document, 
+            Address address, 
+            Document document, 
             string payer, 
-            string email)
+            Email email)
             :base(
                 paidDate, 
                 expireDate, 
