@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using Flunt.Notifications;
+using Flunt.Validations;
 using Payment.Domain.ValueObjects;
 using Payment.Shared.Entities;
 
@@ -7,7 +9,7 @@ namespace Payment.Domain.Entities
 {
     public class Student : Entity
     {
-        private IList<Subscription> _subscriptions;
+        private List<Subscription> _subscriptions;
         public Student(Name name, Document document, Email email, Address address)
         {
             Name = name;
@@ -27,17 +29,18 @@ namespace Payment.Domain.Entities
 
         public void AddSubscription(Subscription subscription){
             
-            var hasSubscriptionActive = false;
+            bool hasSubscriptionActive = false;
             foreach(var sub in _subscriptions){
-                //sub.Inactivate();
                 if(sub.Active)
                     hasSubscriptionActive = true;
             }
 
-            if(hasSubscriptionActive)
-                AddNotification("Student.Subscription","Você já tem uma assinatura ativa");
-            else
-                _subscriptions.Add(subscription);
+            AddNotifications(new Contract<Notification>()
+                .Requires()
+                .IsFalse(hasSubscriptionActive,"Student.Subscription","Você já tem uma assinatura ativa")
+                .AreNotEquals(0,subscription.Payments.Count,"Student.Subscription.Payments","A subscrição precisa de um pagamento")
+            );
+            _subscriptions.Add(subscription);
         }
     }
 }
